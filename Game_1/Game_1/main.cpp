@@ -21,8 +21,16 @@ Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
 
 Eigen::Matrix4f get_model_matrix(float rotation_angle)
 {
+    float radius = rotation_angle * MY_PI / 180.0;
+    float cosA = cos(radius);
+    float sinA = sin(radius);
     Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
-
+    model(0, 0) = cosA;
+    model(1, 0) = -sinA;
+    model(0, 1) = sinA;
+    model(1, 1) = cosA;
+    model(2, 2) = 1;
+    model(3, 3) = 1;
     // TODO: Implement this function
     // Create the model matrix for rotating the triangle around the Z axis.
     // Then return it.
@@ -35,7 +43,16 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
 {
     // Students will implement this function
 
+    float cotA = 1 / tan(eye_fov / 2.0);
+
     Eigen::Matrix4f projection = Eigen::Matrix4f::Identity();
+
+    projection(0, 0) = cotA / aspect_ratio;
+    projection(1, 1) = cotA;
+    projection(2, 2) = -(zFar + zNear) / (zFar - zNear);
+    projection(2, 3) = -(2 * zFar * zNear) / (zFar - zNear);
+    projection(3, 2) =-1;
+
 
     // TODO: Implement this function
     // Create the projection matrix for the given parameters.
@@ -43,10 +60,10 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
 
     return projection;
 }
-
+float angle = 0;
 int main(int argc, const char** argv)
 {
-    float angle = 0;
+   
     bool command_line = false;
     std::string filename = "output.png";
 
@@ -71,7 +88,7 @@ int main(int argc, const char** argv)
 
     int key = 0;
     int frame_count = 0;
-
+    angle += 100;
     if (command_line) {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
@@ -87,7 +104,7 @@ int main(int argc, const char** argv)
 
         return 0;
     }
-
+  
     while (key != 27) {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
@@ -110,6 +127,7 @@ int main(int argc, const char** argv)
         else if (key == 'd') {
             angle -= 10;
         }
+      
     }
 
     return 0;
